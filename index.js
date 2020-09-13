@@ -29,7 +29,6 @@ app.get('/api/turnos',(req, res) => {
 
     const turnos = db.get('turnos').filter({finished: false})
     .sortBy('number')
-    .take(5)
     .value()
     
     res.status(200).send(turnos)
@@ -54,8 +53,11 @@ app.post('/api/turnos',(req, res) => {
 
     const {name, project} = req.body
     const turnos = db.get('turnos')
-    turnos.insert({ date: mm+'-'+dd+'-'+yyyy, finished: false,name, project, number: turnos.size().value()+1}).write()
-    res.status(200).send(turnos)
+    turnos.insert({ date: mm+'-'+dd+'-'+yyyy,finished: false,name, project, number: turnos.size().value()+1}).write()
+    const newturnos = db.get('turnos').filter({finished: false})
+    .sortBy('number')
+    .value()
+    res.status(200).send(newturnos)
     
 })
 
@@ -68,7 +70,9 @@ app.post('/api/finish',(req, res) => {
     .assign({ finished})
     .write()
 
-    const turnos = db.get('turnos')
+    const turnos = db.get('turnos').filter({finished: false})
+    .sortBy('number')
+    .value()
 
     res.status(200).send(turnos)
     

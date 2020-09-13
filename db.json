@@ -1,24 +1,5 @@
 {
   "turnos": [
-    {
-      "finished": true,
-      "name": "rodrigo m",
-      "project": "mesa",
-      "number": 1,
-      "id": "2f70da83-fbb4-4146-9d7b-6b58d972d03d"
-    },
-    {
-      "finished": false,
-      "name": "rodrigo m",
-      "project": "mesa",
-      "number": 2,
-      "id": "6c6f5dec-83af-4e5a-ae5d-f3d84c013d2f"
-    },
-    {
-      "finished": false,
-      "number": 3,
-      "id": "3604d34f-e8eb-4cdc-8388-0a8642b22a6a"
-    }
   ],
   "count": 0
 }
