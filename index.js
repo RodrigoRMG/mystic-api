@@ -37,10 +37,24 @@ app.get('/api/turnos',(req, res) => {
 })
 
 app.post('/api/turnos',(req, res) => {
+    var today = new Date();
+    var dd = today.getDate();
+
+    var mm = today.getMonth()+1; 
+    var yyyy = today.getFullYear();
+    if(dd<10) 
+    {
+        dd='0'+dd;
+    } 
+
+    if(mm<10) 
+    {
+        mm='0'+mm;
+    } 
 
     const {name, project} = req.body
     const turnos = db.get('turnos')
-    turnos.insert({ finished: false,name, project, number: turnos.size().value()+1}).write()
+    turnos.insert({ date: mm+'-'+dd+'-'+yyyy, finished: false,name, project, number: turnos.size().value()+1}).write()
     res.status(200).send(turnos)
     
 })
