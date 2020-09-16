@@ -11,10 +11,10 @@ app.use(bodyParser.json())
 
 const Pool = require('pg').Pool
 const pool = new Pool({
-  user: 'lhjtjliaqevoex',
-  host: 'ec2-54-146-142-58.compute-1.amazonaws.com',
-  database: 'dcot2gfmvqm1u9',
-  password: '1cfa5dd55d0666f4bdf1949ec4b7e6e9482a2a6c31510c7e9ceec7e093e7da1d',
+  user: 'gbsibbylzvulqh',
+  host: 'ec2-54-211-169-227.compute-1.amazonaws.com',
+  database: 'd49d15lpo859qv',
+  password: '5189d0ba2f97dbad20b722a25e88be74093c31ad4ad86ca5b90ee6d730770f0b',
   port: 5432,
   ssl: {
     rejectUnauthorized: false
