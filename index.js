@@ -1,9 +1,6 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 const http = require('http')
-const low = require('lowdb')
-const lodashId = require('lodash-id')
-const FileSync = require('lowdb/adapters/FileSync')
 
 const app = express()
 const server = http.createServer(app)
@@ -12,9 +9,18 @@ const PORT = process.env.PORT || 3000
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const adapter = new FileSync('db.json')
-const db = low(adapter);
-db._.mixin(lodashId);
+const Pool = require('pg').Pool
+const pool = new Pool({
+  user: 'lhjtjliaqevoex',
+  host: 'ec2-54-146-142-58.compute-1.amazonaws.com',
+  database: 'dcot2gfmvqm1u9',
+  password: '1cfa5dd55d0666f4bdf1949ec4b7e6e9482a2a6c31510c7e9ceec7e093e7da1d',
+  port: 5432,
+  ssl: {
+    rejectUnauthorized: false
+  }
+})
+
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,11 +33,12 @@ app.use(function (req, res, next) {
 
 app.get('/api/turnos',(req, res) => {
 
-    const turnos = db.get('turnos').filter({finished: false})
-    .sortBy('number')
-    .value()
-    
-    res.status(200).send(turnos)
+    pool.query('SELECT * FROM turnos where finished=0 ORDER BY id ASC', (error, results) => {
+        if (error) {
+          throw error
+        }
+        res.status(200).json(results.rows)
+      });
     
 })
 
@@ -52,30 +59,38 @@ app.post('/api/turnos',(req, res) => {
     } 
 
     const {name, project} = req.body
-    const turnos = db.get('turnos')
-    turnos.insert({ date: mm+'-'+dd+'-'+yyyy,finished: false,name, project, number: turnos.size().value()+1}).write()
-    const newturnos = db.get('turnos').filter({finished: false})
-    .sortBy('number')
-    .value()
-    res.status(200).send(newturnos)
+
+    pool.query('INSERT INTO turnos (name, project, finished, date) VALUES ($1, $2, $3, $4)', [name, project, 0, dd+'-'+mm+'-'+yyyy], (error, results) => {
+        if (error) {
+          throw error
+        }
+        pool.query('SELECT * FROM turnos where finished=0 ORDER BY id ASC', (error, results) => {
+            if (error) {
+                throw error
+            }
+            res.status(200).json(results.rows)
+        })
+      });
     
 })
 
 app.post('/api/finish',(req, res) => {
-
     const {id, finished} = req.body
-    
-    db.get('turnos')
-    .find({ id })
-    .assign({ finished})
-    .write()
-
-    const turnos = db.get('turnos').filter({finished: false})
-    .sortBy('number')
-    .value()
-
-    res.status(200).send(turnos)
-    
+    pool.query(
+        'UPDATE turnos SET finished = $1 WHERE id = $2',
+        [finished, id],
+        (error, results) => {
+          if (error) {
+            throw error
+          }
+          pool.query('SELECT * FROM turnos where finished=0 ORDER BY id ASC', (error, results) => {
+                if (error) {
+                    throw error
+                }
+                res.status(200).json(results.rows)
+        })
+        }
+      );
 })
 
 server.listen(PORT, () => console.log(`server runnig in http://localhost:${PORT}`))
